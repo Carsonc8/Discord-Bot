@@ -8,10 +8,9 @@ from dotenv import find_dotenv, load_dotenv
 import requests
 
 MAX_SESSION_TIME_MINUTES = 1
-#CHANNEL_ID = os.getenv("CHANNEL_ID")
-CHANNEL_ID = 1190765028467556393
-BOT_TOKEN ="MTE5MDc2MzE5ODg3MDE5NjI5NQ.GRW1ix.7eCONZ4vIhbL_WpXENeTknOTsVWbABzwp2R-OI" 
-#os.getenv("BOT_TOKEN")
+CHANNEL_ID = os.getenv("CHANNEL_ID")
+
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 #find .env automatically by "walking" up directories until it is found
 dotenv_path = find_dotenv()
