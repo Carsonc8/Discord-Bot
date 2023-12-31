@@ -3,11 +3,15 @@ from discord.ext import commands, tasks
 import discord
 from dataclasses import dataclass
 import os
+import disnake
 from dotenv import find_dotenv, load_dotenv
+import requests
 
 MAX_SESSION_TIME_MINUTES = 1
-CHANNEL_ID = os.getenv("CHANNEL_ID")
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+#CHANNEL_ID = os.getenv("CHANNEL_ID")
+CHANNEL_ID = 1190765028467556393
+BOT_TOKEN ="MTE5MDc2MzE5ODg3MDE5NjI5NQ.GRW1ix.7eCONZ4vIhbL_WpXENeTknOTsVWbABzwp2R-OI" 
+#os.getenv("BOT_TOKEN")
 
 #find .env automatically by "walking" up directories until it is found
 dotenv_path = find_dotenv()
@@ -85,6 +89,20 @@ async def break_reminder():
         return
     channel = bot.get_channel(CHANNEL_ID)
     await channel.send(f"**Take a break!** You've been studying for {MAX_SESSION_TIME_MINUTES} minutes!")
+
+
+@bot.command()
+async def pb(ctx ):
+    r = requests.get(url="https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=2073850")
+    d = r.json()
+    index = d['response']
+    player_count = index["player_count"]
+    embed = disnake.Embed(title=f"Cow's player base!", 
+                       description=f"Total Players: {player_count}", 
+                       color = disnake.Colour.random(),
+                       timestamp=datetime.datetime.now(),)
+    await ctx.send(embed=embed)
+
 
 #Runs the bot
 bot.run(BOT_TOKEN)
