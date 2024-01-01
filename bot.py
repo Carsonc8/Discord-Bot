@@ -1,16 +1,8 @@
-import datetime
+import datetime, discord, os, disnake, requests
 from discord.ext import commands, tasks
-import discord
 from dataclasses import dataclass
-import os
-import disnake
 from dotenv import find_dotenv, load_dotenv
-import requests
 
-MAX_SESSION_TIME_MINUTES = 1
-CHANNEL_ID = os.getenv("CHANNEL_ID")
-
-BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 #find .env automatically by "walking" up directories until it is found
 dotenv_path = find_dotenv()
@@ -18,7 +10,9 @@ dotenv_path = find_dotenv()
 #load up the entries as enviroment variables
 load_dotenv(dotenv_path)
 
-
+MAX_SESSION_TIME_MINUTES = 1
+CHANNEL_ID = os.getenv("CHANNEL_ID")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 @dataclass
 class Session:
@@ -30,20 +24,19 @@ bot = commands.Bot(command_prefix="!", intents=discord.Intents.all())
 #Creates session
 session = Session()
 
-
-
-#Event
 @bot.event
 async def on_ready():
     print("The bot is up and running!")
-    channel = bot.get_channel(CHANNEL_ID)
-    #Sends this to the channel
-    await channel.send("Hello! I am ready!") 
+    try:
+        synced = await bot.tree.sync()
+        print(f"Synced{len(synced)} commands")
+    except Exception as e:
+        print(e)
+    
 
-#Command ex. !hello returns Hi! | You can change the command_prefix to whatever instead of ! | You can also name the given input anything not just ctx
-@bot.command()
-async def hello(ctx):
-    await ctx.send("Hi!")
+@bot.tree.command(name="Hello")
+async def hello(interaction: discord.Interaction):
+    await interaction.response.send_message(f"Hey {interaction.user.mention} This is a slash command!", ephemeral=True)
 
 #Stored as an array so it can take any amount of inputs and then adds them and returns the total
 @bot.command()
@@ -96,10 +89,12 @@ async def pb(ctx ):
     d = r.json()
     index = d['response']
     player_count = index["player_count"]
-    embed = disnake.Embed(title=f"Cow's player base!", 
+    embed = disnake.Embed(title=f"The Final's Player Base!", 
                        description=f"Total Players: {player_count}", 
                        color = disnake.Colour.random(),
                        timestamp=datetime.datetime.now(),)
+    embed.set_image(url="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQuYQlQJ3RSdshlbZP2otBaYkze_JmPvKVSAxEflabXtcoijRqY")
+    
     await ctx.send(embed=embed)
 
 
