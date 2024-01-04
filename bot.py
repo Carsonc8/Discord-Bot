@@ -1,4 +1,8 @@
 import datetime, discord, os, disnake, requests
+from typing import List, Optional
+from discord.components import SelectOption
+from discord.utils import MISSING
+from discord.ui import Select, View
 from discord.ext import commands, tasks
 from dataclasses import dataclass
 from dotenv import find_dotenv, load_dotenv
@@ -34,7 +38,8 @@ async def on_ready():
         print(e)
     
 
-@bot.tree.command(name="Hello")
+#name="Hello"
+@bot.tree.command()
 async def hello(interaction: discord.Interaction):
     await interaction.response.send_message(f"Hey {interaction.user.mention} This is a slash command!", ephemeral=True)
 
@@ -84,7 +89,7 @@ async def break_reminder():
 
 
 @bot.command()
-async def pb(ctx ):
+async def pb(ctx):
     r = requests.get(url="https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=2073850")
     d = r.json()
     index = d['response']
@@ -97,6 +102,37 @@ async def pb(ctx ):
     
     await ctx.send(embed=embed)
 
+class AnimalSelect(Select):
+    def __init__(self) -> None:
+        super().__init__(
+            min_values=1,
+            max_values=2,
+            placeholder="Pick a Game!",
+            options=[
+            discord.SelectOption(
+                label="Cow", 
+                description="cow"
+            ),
+            discord.SelectOption(
+                label="Chicken", 
+                description="chicken"
+            ),
+            ]
+        )
+         
+    async def callback(self, interaction):
+        new_return = str(self.values)[1:-1].replace("'", "")
+        await interaction.response.send_message(f"You chose: {new_return}")
+
+@bot.command()
+async def dd(ctx):
+    select = AnimalSelect()
+    view = View()
+    view.add_item(select)
+
+    await ctx.send("Choose one! ", view=view)
+
+    
 
 #Runs the bot
 bot.run(BOT_TOKEN)
